@@ -16,7 +16,7 @@
 
 #define MIN_BASE_HEIGHT 64
 
-#define VIEW_DISTANCE 5
+#define VIEW_DISTANCE 10
 
 #define _USE_MATH_DEFINES
 

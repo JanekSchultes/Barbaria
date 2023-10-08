@@ -25,12 +25,15 @@ public:
     Chunk(int base_height, int climate, Vec2 position);
     Chunk(std::string chunk_file);
     void save(std::string name);
+    void registerToRenderer();
+    void removeChunkBorder(int x, int y, int z);
     static bool debug;
     int height_map[CHUNK_LENGTH][CHUNK_LENGTH];
+    BlockLayer* block_layers;
 private:
     int base_height = 0;
-    std::vector<BlockLayer> block_layers;
     std::vector<BlockFace> visible_block_faces;
+    Vec2 pos;
 };
 
 #endif

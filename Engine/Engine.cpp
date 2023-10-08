@@ -83,7 +83,7 @@ void Engine::renderChunks(float ambient_strength) {
 
     block_atlas.bind();
 
-    glDepthMask(GL_FALSE);
+    glDepthMask(GL_TRUE);
     glDepthFunc(GL_EQUAL);
 
     VoxelRender::render();

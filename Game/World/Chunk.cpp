@@ -6,6 +6,9 @@ BlockLayer::BlockLayer() {
     layer = new Block * [CHUNK_LENGTH];
     for (int i = 0; i < CHUNK_LENGTH; ++i) {
         layer[i] = new Block[CHUNK_LENGTH];
+        for (int j = 0; j < CHUNK_LENGTH; ++j) {
+            layer[i][j] = Air({ 0.0f, 0.0f, 0.0f });
+        }
     }
 }
 
@@ -33,7 +36,9 @@ Chunk::Chunk() {
 }
 
 Chunk::Chunk(int base_height, int climate, Vec2 position) {
-    block_layers = std::vector<BlockLayer>(MAX_HEIGHT);
+    pos = position;
+    /* Generate random height map*/
+    block_layers = new BlockLayer[MAX_HEIGHT];
     int steepness = MAX_STEEPNESS * (1 - (base_height / MAX_HEIGHT) * (base_height / MAX_HEIGHT));
     for (int i = 0; i < CHUNK_LENGTH; ++i) {
         for (int j = 0; j < CHUNK_LENGTH; ++j) {
@@ -41,9 +46,11 @@ Chunk::Chunk(int base_height, int climate, Vec2 position) {
         }
     }
 
+    /* Fill with blocks */
     for (int i = 0; i < CHUNK_LENGTH; ++i) {
         for (int j = 0; j < CHUNK_LENGTH; ++j) {
             for (int z = 0; z < MAX_HEIGHT - 1; ++z) {
+                //block_layers[z] = BlockLayer();
                 if (z < height_map[i][j]) {
                     block_layers[z].layer[i][j] = DirtBlock({ (float)(position.x * 16 + i), (float)(position.y * 16 + j), (float)z });
                 }
@@ -58,7 +65,10 @@ Chunk::Chunk(int base_height, int climate, Vec2 position) {
 
         }
     }
+}
 
+void Chunk::registerToRenderer() {
+    /* Determine faces not to be rendered*/
     int face_count = 0;
 
     for (int i = 0; i < CHUNK_LENGTH; ++i) {
@@ -87,6 +97,9 @@ Chunk::Chunk(int base_height, int climate, Vec2 position) {
                 if (j == CHUNK_LENGTH - 1) render_front = true;
                 else if (block_layers[z].layer[i][j + 1].is_air) render_front = true;
 
+                if (i == 0 && block_layers[z].layer[i][j].remove_border) render_left = false;
+                if (j == 0 && block_layers[z].layer[i][j].remove_border) render_front = false;
+
                 //if(i>2 || j>2)continue;
 
                 unsigned int bottom_id;
@@ -98,13 +111,17 @@ Chunk::Chunk(int base_height, int climate, Vec2 position) {
 
 
 
-                if (render_bottom) VoxelRender::registerFace(bottom_id, { (float)i, (float)z, (float)j }, position, BOTTOM, block_layers[z].layer[i][j].bottom.texture.index);
-                if (render_top) VoxelRender::registerFace(top_id, { (float)i, (float)z, (float)j }, position, TOP, block_layers[z].layer[i][j].top.texture.index);
-                if (render_back) VoxelRender::registerFace(back_id, { (float)i, (float)z, (float)j }, position, BACK, block_layers[z].layer[i][j].back.texture.index);
-                if (render_front) VoxelRender::registerFace(front_id, { (float)i, (float)z, (float)j }, position, FRONT, block_layers[z].layer[i][j].front.texture.index);
-                if (render_left) VoxelRender::registerFace(left_id, { (float)i, (float)z, (float)j }, position, LEFT, block_layers[z].layer[i][j].left.texture.index);
-                if (render_right)  VoxelRender::registerFace(right_id, { (float)i, (float)z, (float)j }, position, RIGHT, block_layers[z].layer[i][j].right.texture.index);
+                if (render_bottom) VoxelRender::registerFace(bottom_id, { (float)i, (float)z, (float)j }, pos, BOTTOM, block_layers[z].layer[i][j].bottom.texture.index);
+                if (render_top) VoxelRender::registerFace(top_id, { (float)i, (float)z, (float)j }, pos, TOP, block_layers[z].layer[i][j].top.texture.index);
+                if (render_back) VoxelRender::registerFace(back_id, { (float)i, (float)z, (float)j }, pos, BACK, block_layers[z].layer[i][j].back.texture.index);
+                if (render_front) VoxelRender::registerFace(front_id, { (float)i, (float)z, (float)j }, pos, FRONT, block_layers[z].layer[i][j].front.texture.index);
+                if (render_left) VoxelRender::registerFace(left_id, { (float)i, (float)z, (float)j }, pos, LEFT, block_layers[z].layer[i][j].left.texture.index);
+                if (render_right)  VoxelRender::registerFace(right_id, { (float)i, (float)z, (float)j }, pos, RIGHT, block_layers[z].layer[i][j].right.texture.index);
             }
         }
     }
+}
+
+void Chunk::removeChunkBorder(int x, int y, int z) {
+    block_layers[z].layer[x][y].remove_border = true;
 }

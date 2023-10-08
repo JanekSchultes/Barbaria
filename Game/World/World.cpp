@@ -17,6 +17,27 @@ void World::loadInitialChunks(Vec2 spawn_pos) {
         for (int y = -VIEW_DISTANCE; y <= VIEW_DISTANCE; ++y) {
             Vec2 chunk_pos = { chunk_pos_x + x, chunk_pos_y + y };
             chunks[x + VIEW_DISTANCE][y + VIEW_DISTANCE] = Chunk(getBaseLevel(chunk_pos), getClimate(chunk_pos), chunk_pos);
+            if (x > -VIEW_DISTANCE) {
+                Chunk bordering_chunk = chunks[x + VIEW_DISTANCE - 1][y + VIEW_DISTANCE];
+                for (int cy = 0; cy < 16; ++cy) {
+                    for (int cz = 0; cz < bordering_chunk.height_map[15][cy]; ++cz) {
+                        if (!bordering_chunk.block_layers[cz].layer[15][cy].is_air) {
+                            chunks[x + VIEW_DISTANCE][y + VIEW_DISTANCE].removeChunkBorder(0, cy, cz);
+                        }
+                    }
+                }
+            }
+            if (y > -VIEW_DISTANCE) {
+                Chunk bordering_chunk = chunks[x + VIEW_DISTANCE][y + VIEW_DISTANCE - 1];
+                for (int cx = 0; cx < 16; ++cx) {
+                    for (int cz = 0; cz < bordering_chunk.height_map[cx][15] - 1; ++cz) {
+                        if (!bordering_chunk.block_layers[cz].layer[cx][15].is_air) {
+                            chunks[x + VIEW_DISTANCE][y + VIEW_DISTANCE].removeChunkBorder(cx, 0, cz);
+                        }
+                    }
+                }
+            }
+            chunks[x + VIEW_DISTANCE][y + VIEW_DISTANCE].registerToRenderer();
         }
     }
     int height = chunks[0][0].height_map[(int)(spawn_pos.x / 16.0f)][(int)(spawn_pos.y / 16.0f)] + 2;

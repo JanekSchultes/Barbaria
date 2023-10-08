@@ -26,6 +26,7 @@ public:
     BlockFace right;
     BlockFace front;
     BlockFace back;
+    bool remove_border = false;
 private:
 };
 
