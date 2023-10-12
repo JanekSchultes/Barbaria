@@ -14,7 +14,7 @@
 #include "Window/Input.h"
 
 #include "Object/Texture.h"
-#include "Object/Voxel_render.h"
+#include "Object/voxel_render.h"
 
 namespace Engine {
     void init();
