@@ -26,7 +26,9 @@ private:
     PerspectiveView fps_view = PerspectiveView(45.0f, WINDOW_SIZE_X / WINDOW_SIZE_Y, 0.01f, 100.0f);
     World game_world = World();
 
+    std::thread render_thread;
     std::thread input_thread;
+    std::thread world_thread;
 };
 
 #endif
