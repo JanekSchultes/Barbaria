@@ -16,33 +16,64 @@ public:
 
 class Block {
 public:
-    Block();
-    Block(Vec3 position, bool is_visible);
-    Vec3 position;
-    bool is_air;
-    BlockFace top;
-    BlockFace bottom;
-    BlockFace left;
-    BlockFace right;
-    BlockFace front;
-    BlockFace back;
-    bool remove_border = false;
-private:
+    virtual BlockFace getTopFace() = 0;
+    virtual BlockFace getBottomFace() = 0;
+    virtual BlockFace getBackFace() = 0;
+    virtual BlockFace getFrontFace() = 0;
+    virtual BlockFace getLeftFace() = 0;
+    virtual BlockFace getRightFace() = 0;
 };
 
 class GrassBlock : public Block {
 public:
-    GrassBlock(Vec3 position);
+    BlockFace getTopFace() override { return grassFace; }
+    BlockFace getBottomFace() override { return dirtFace; }
+    BlockFace getLeftFace() override { return dirtFace; }
+    BlockFace getRightFace() override { return dirtFace; }
+    BlockFace getFrontFace() override { return dirtFace; }
+    BlockFace getBackFace() override { return dirtFace; }
+private:
+    static BlockFace grassFace;
+    static BlockFace dirtFace;
 };
 
 class DirtBlock : public Block {
 public:
-    DirtBlock(Vec3 position);
+    BlockFace getTopFace() override { return dirtFace; }
+    BlockFace getBottomFace() override { return dirtFace; }
+    BlockFace getLeftFace() override { return dirtFace; }
+    BlockFace getRightFace() override { return dirtFace; }
+    BlockFace getFrontFace() override { return dirtFace; }
+    BlockFace getBackFace() override { return dirtFace; }
+
+private:
+    static BlockFace dirtFace;
 };
 
-class Air : public Block {
+class BlockInstance {
 public:
-    Air(Vec3 position);
+    BlockInstance();
+    BlockInstance(Vec3 position, bool is_visible);
+    Vec3 position;
+    bool is_air;
+    bool remove_border = false;
+    Block* block;
+private:
+};
+
+class GrassBlockInstance : public BlockInstance {
+public:
+    GrassBlockInstance(Vec3 position);
+};
+
+class DirtBlockInstance : public BlockInstance {
+public:
+    DirtBlockInstance(Vec3 position);
+};
+
+class AirInstance : public BlockInstance {
+public:
+    AirInstance(Vec3 position);
 };
 
 #endif

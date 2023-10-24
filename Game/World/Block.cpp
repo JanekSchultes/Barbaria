@@ -1,5 +1,12 @@
 #include "Block.h"
 
+GrassBlock grass = GrassBlock();
+DirtBlock dirt = DirtBlock();
+
+BlockFace GrassBlock::dirtFace = BlockFace(DirtTexture());
+BlockFace GrassBlock::grassFace = BlockFace(GrassTexture());
+BlockFace DirtBlock::dirtFace = BlockFace(DirtTexture());
+
 BlockFace::BlockFace() {
 
 }
@@ -7,37 +14,27 @@ BlockFace::BlockFace() {
 BlockFace::BlockFace(GameTexture texture) : texture(texture) {
 }
 
-Block::Block() {
+BlockInstance::BlockInstance() {
 
 }
 
-Block::Block(Vec3 position, bool is_visible) : position(position) {
+BlockInstance::BlockInstance(Vec3 position, bool is_visible) : position(position) {
 
 }
 
-GrassBlock::GrassBlock(Vec3 position) {
+GrassBlockInstance::GrassBlockInstance(Vec3 position) {
     this->position = position;
     this->is_air = false;
-    this->top = BlockFace(GrassTexture());
-    this->bottom = BlockFace(DirtTexture());
-    this->left = BlockFace(GrassSideTexture());
-    this->right = BlockFace(GrassSideTexture());
-    this->front = BlockFace(GrassSideTexture());
-    this->back = BlockFace(GrassSideTexture());
+    this->block = &grass;
 }
 
-DirtBlock::DirtBlock(Vec3 position) {
+DirtBlockInstance::DirtBlockInstance(Vec3 position) {
     this->position = position;
     this->is_air = false;
-    this->top = BlockFace(DirtTexture());
-    this->bottom = BlockFace(DirtTexture());
-    this->left = BlockFace(DirtTexture());
-    this->right = BlockFace(DirtTexture());
-    this->front = BlockFace(DirtTexture());
-    this->back = BlockFace(DirtTexture());
+    this->block = &dirt;
 }
 
-Air::Air(Vec3 position) {
+AirInstance::AirInstance(Vec3 position) {
     this->position = position;
     this->is_air = true;
 }

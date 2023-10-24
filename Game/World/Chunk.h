@@ -14,9 +14,9 @@
 class BlockLayer {
 public:
     BlockLayer();
-    BlockLayer(Block blocks[CHUNK_LENGTH][CHUNK_LENGTH]);
+    BlockLayer(BlockInstance blocks[CHUNK_LENGTH][CHUNK_LENGTH]);
     ~BlockLayer();
-    Block** layer;
+    BlockInstance** layer;
 };
 
 class Chunk {

@@ -3,19 +3,19 @@
 bool Chunk::debug = false;
 
 BlockLayer::BlockLayer() {
-    layer = new Block * [CHUNK_LENGTH];
+    layer = new BlockInstance * [CHUNK_LENGTH];
     for (int i = 0; i < CHUNK_LENGTH; ++i) {
-        layer[i] = new Block[CHUNK_LENGTH];
+        layer[i] = new BlockInstance[CHUNK_LENGTH];
         for (int j = 0; j < CHUNK_LENGTH; ++j) {
-            layer[i][j] = Air({ 0.0f, 0.0f, 0.0f });
+            layer[i][j] = AirInstance({ 0.0f, 0.0f, 0.0f });
         }
     }
 }
 
-BlockLayer::BlockLayer(Block blocks[CHUNK_LENGTH][CHUNK_LENGTH]) {
-    layer = new Block * [CHUNK_LENGTH];
+BlockLayer::BlockLayer(BlockInstance blocks[CHUNK_LENGTH][CHUNK_LENGTH]) {
+    layer = new BlockInstance * [CHUNK_LENGTH];
     for (int i = 0; i < CHUNK_LENGTH; ++i) {
-        layer[i] = new Block[CHUNK_LENGTH];
+        layer[i] = new BlockInstance[CHUNK_LENGTH];
     }
     for (int i = 0; i < CHUNK_LENGTH; ++i) {
         for (int j = 0; j < CHUNK_LENGTH; ++j) {
@@ -52,13 +52,13 @@ Chunk::Chunk(int base_height, int climate, Vec2 position) {
             for (int z = 0; z < MAX_HEIGHT - 1; ++z) {
                 //block_layers[z] = BlockLayer();
                 if (z < height_map[i][j]) {
-                    block_layers[z].layer[i][j] = DirtBlock({ (float)(position.x * 16 + i), (float)(position.y * 16 + j), (float)z });
+                    block_layers[z].layer[i][j] = DirtBlockInstance({ (float)(position.x * 16 + i), (float)(position.y * 16 + j), (float)z });
                 }
                 else if (z == height_map[i][j]) {
-                    block_layers[height_map[i][j]].layer[i][j] = GrassBlock({ (float)(position.x * 16 + i), (float)(position.y * 16 + j), (float)height_map[i][j] });
+                    block_layers[height_map[i][j]].layer[i][j] = GrassBlockInstance({ (float)(position.x * 16 + i), (float)(position.y * 16 + j), (float)height_map[i][j] });
                 }
                 else {
-                    block_layers[z].layer[i][j] = Air({ (float)(position.x * 16 + i), (float)(position.y * 16 + j), (float)z });
+                    block_layers[z].layer[i][j] = AirInstance({ (float)(position.x * 16 + i), (float)(position.y * 16 + j), (float)z });
                 }
                 //std::cout << "Block at x: " << i << " y: " << j << " z: " << z << " is air: " << block_layers[z].layer[i][j].is_air << '\n'; 
             }
@@ -111,12 +111,12 @@ void Chunk::registerToRenderer() {
 
 
 
-                if (render_bottom) VoxelRender::registerFace(bottom_id, { (float)i, (float)z, (float)j }, pos, BOTTOM, block_layers[z].layer[i][j].bottom.texture.index);
-                if (render_top) VoxelRender::registerFace(top_id, { (float)i, (float)z, (float)j }, pos, TOP, block_layers[z].layer[i][j].top.texture.index);
-                if (render_back) VoxelRender::registerFace(back_id, { (float)i, (float)z, (float)j }, pos, BACK, block_layers[z].layer[i][j].back.texture.index);
-                if (render_front) VoxelRender::registerFace(front_id, { (float)i, (float)z, (float)j }, pos, FRONT, block_layers[z].layer[i][j].front.texture.index);
-                if (render_left) VoxelRender::registerFace(left_id, { (float)i, (float)z, (float)j }, pos, LEFT, block_layers[z].layer[i][j].left.texture.index);
-                if (render_right)  VoxelRender::registerFace(right_id, { (float)i, (float)z, (float)j }, pos, RIGHT, block_layers[z].layer[i][j].right.texture.index);
+                if (render_bottom) VoxelRender::registerFace(bottom_id, { (float)i, (float)z, (float)j }, pos, BOTTOM, block_layers[z].layer[i][j].block->getBottomFace().texture.index);
+                if (render_top) VoxelRender::registerFace(top_id, { (float)i, (float)z, (float)j }, pos, TOP, block_layers[z].layer[i][j].block->getTopFace().texture.index);
+                if (render_back) VoxelRender::registerFace(back_id, { (float)i, (float)z, (float)j }, pos, BACK, block_layers[z].layer[i][j].block->getBackFace().texture.index);
+                if (render_front) VoxelRender::registerFace(front_id, { (float)i, (float)z, (float)j }, pos, FRONT, block_layers[z].layer[i][j].block->getFrontFace().texture.index);
+                if (render_left) VoxelRender::registerFace(left_id, { (float)i, (float)z, (float)j }, pos, LEFT, block_layers[z].layer[i][j].block->getLeftFace().texture.index);
+                if (render_right)  VoxelRender::registerFace(right_id, { (float)i, (float)z, (float)j }, pos, RIGHT, block_layers[z].layer[i][j].block->getRightFace().texture.index);
             }
         }
     }
