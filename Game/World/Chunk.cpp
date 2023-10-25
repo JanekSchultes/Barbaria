@@ -36,6 +36,7 @@ Chunk::Chunk() {
 }
 
 Chunk::Chunk(int base_height, int climate, Vec2 position) {
+    chunk_render = new ChunkRender();
     pos = position;
     /* Generate random height map*/
     block_layers = new BlockLayer[MAX_HEIGHT];
@@ -110,16 +111,19 @@ void Chunk::registerToRenderer() {
                 unsigned int right_id;
 
 
-
-                if (render_bottom) VoxelRender::registerFace(bottom_id, { (float)i, (float)z, (float)j }, pos, BOTTOM, block_layers[z].layer[i][j].block->getBottomFace().texture.index);
-                if (render_top) VoxelRender::registerFace(top_id, { (float)i, (float)z, (float)j }, pos, TOP, block_layers[z].layer[i][j].block->getTopFace().texture.index);
-                if (render_back) VoxelRender::registerFace(back_id, { (float)i, (float)z, (float)j }, pos, BACK, block_layers[z].layer[i][j].block->getBackFace().texture.index);
-                if (render_front) VoxelRender::registerFace(front_id, { (float)i, (float)z, (float)j }, pos, FRONT, block_layers[z].layer[i][j].block->getFrontFace().texture.index);
-                if (render_left) VoxelRender::registerFace(left_id, { (float)i, (float)z, (float)j }, pos, LEFT, block_layers[z].layer[i][j].block->getLeftFace().texture.index);
-                if (render_right)  VoxelRender::registerFace(right_id, { (float)i, (float)z, (float)j }, pos, RIGHT, block_layers[z].layer[i][j].block->getRightFace().texture.index);
+                if (render_bottom) chunk_render->register_face(bottom_id, { (float)i, (float)z, (float)j }, pos, BOTTOM, block_layers[z].layer[i][j].block->getBottomFace().texture.index);
+                if (render_top) chunk_render->register_face(top_id, { (float)i, (float)z, (float)j }, pos, TOP, block_layers[z].layer[i][j].block->getTopFace().texture.index);
+                if (render_back) chunk_render->register_face(back_id, { (float)i, (float)z, (float)j }, pos, BACK, block_layers[z].layer[i][j].block->getBackFace().texture.index);
+                if (render_front) chunk_render->register_face(front_id, { (float)i, (float)z, (float)j }, pos, FRONT, block_layers[z].layer[i][j].block->getFrontFace().texture.index);
+                if (render_left) chunk_render->register_face(left_id, { (float)i, (float)z, (float)j }, pos, LEFT, block_layers[z].layer[i][j].block->getLeftFace().texture.index);
+                if (render_right)  chunk_render->register_face(right_id, { (float)i, (float)z, (float)j }, pos, RIGHT, block_layers[z].layer[i][j].block->getRightFace().texture.index);
             }
         }
     }
+}
+
+void Chunk::render() {
+    chunk_render->render();
 }
 
 void Chunk::removeChunkBorder(int x, int y, int z) {

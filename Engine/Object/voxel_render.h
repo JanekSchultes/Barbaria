@@ -6,14 +6,14 @@
 #include <GL/glew.h>
 #include <iostream>
 
-#define VERTEX_BUFFER_INITIAL_SIZE 512 * 1024 * 1024
-#define INDEX_BUFFER_INITIAL_SIZE 256 * 1024 * 1024
+#define CHUNK_INITAL_FACE_STORAGE 16 * 16 * 16
 #define DATA_PER_VERTEX 3
 #define VERTICES_PER_QUAD 4
 
 #include <vector>
 #include <memory.h>
 #include <math.h>
+#include <mutex>
 
 enum BlockFacing {
     FRONT = 0,
@@ -25,19 +25,27 @@ enum BlockFacing {
 };
 
 
+
 struct BlockFaceInfo {
     BlockFaceInfo(int pos_x, int pos_y, int pos_z, int chunk_pos_x, int chunk_pos_y, bool is_visible, int block_index_x, int block_index_y, BlockFacing facing);
     /* BlockData, BlockFaceData, BlockVertexData => 3 for each side => 4 */
     unsigned int data[4 * 3] = { 0 };
 };
 
-namespace VoxelRender {
-    void setupVoxelRender();
-
-    void registerFace(unsigned int& id, Vec3 pos, Vec2 chunk_pos, BlockFacing facing, Vec2 block_index);
+class ChunkRender {
+public:
+    ChunkRender();
+    void register_face(unsigned int& id, Vec3 pos, Vec2 chunk_pos, BlockFacing facing, Vec2 block_index);
     void freeFace(unsigned int id);
-
     void render();
-}
+    ~ChunkRender();
+private:
+    GLuint vao;
+    GLuint vbo;
+    GLuint index_buffer;
+    std::vector<unsigned int> indices;
+    std::vector<unsigned int> free_vao_locations;
+    std::mutex *gl_mutex;
+};
 
 #endif

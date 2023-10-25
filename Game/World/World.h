@@ -30,6 +30,7 @@ public:
     void updatePlayerPos(Vec3 pos, bool regen);
     void loadInitialChunks(Vec2 spawn_pos);
     void doTick();
+    void render();
     float getAmbientStrength();
     ~World();
 private:

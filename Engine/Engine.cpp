@@ -58,38 +58,17 @@ void Engine::recalculateDepths() {
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE); */
 }
 
-void Engine::renderChunks(float ambient_strength) {
-    //glBlitNamedFramebuffer(depth_frame_buffer, 0, 0, 0, 1920, 1080, 0, 0, 1920, 1080, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+void Engine::prepareRendering(float ambient_strength) {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glClearColor(0.3f, 0.7f, 1.0f, 0.2f);
-
-    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-
-    auto it = shaders.find("precalc_shader");
-    it->second.bind();
-    it->second.pushMatrix4f(active_view.getMatrix(), "projectionMatrix");
-    it->second.pushMatrix4f(active_camera.getViewMatrix(), "viewMatrix");
-
-    VoxelRender::render();
-
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-
     active_shader.bind();
     active_shader.pushMatrix4f(active_view.getMatrix(), "projectionMatrix");
     active_shader.pushMatrix4f(active_camera.getViewMatrix(), "viewMatrix");
     active_shader.pushFloat(ambient_strength, "ambientLight");
-
     block_atlas.bind();
+}
 
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_EQUAL);
-
-    VoxelRender::render();
-
-    glDepthFunc(GL_LESS);
-    glDepthMask(GL_TRUE);
-
+void Engine::finishRendering() {
     glfwSwapBuffers(active_window.getWindowPointer());
     glfwPollEvents();
 }
@@ -103,7 +82,6 @@ void Engine::destroy() {
 
 void Engine::registerWindow(Window window, std::string name) {
     windows.insert({ name, window });
-    VoxelRender::setupVoxelRender();
 }
 
 void Engine::registerInputHandler(InputHandler input_handler, std::string name) {

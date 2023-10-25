@@ -21,7 +21,9 @@ namespace Engine {
     void destroy();
 
     void recalculateDepths();
-    void renderChunks(float ambient_strength);
+
+    void prepareRendering(float ambient_strength);
+    void finishRendering();
 
     void registerWindow(Window window, std::string name);
     void registerInputHandler(InputHandler input_handler, std::string name);

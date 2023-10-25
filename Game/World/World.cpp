@@ -50,6 +50,14 @@ void World::updatePlayerPos(Vec3 pos, bool regenChunks) {
 
 }
 
+void World::render() {
+    for(int i = 0; i < VIEW_DISTANCE; ++i) {
+        for(int j = 0; j < VIEW_DISTANCE; ++j) {
+            chunks[i][j].render();
+        }
+    }
+}
+
 void World::doTick() {
     day_time++;
     if (day_time >= (DAY_DURATION * 60 * 3)) {

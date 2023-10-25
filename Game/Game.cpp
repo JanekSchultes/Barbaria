@@ -47,7 +47,9 @@ void Game::game_loop() {
     while (1) {
        // double time = glfwGetTime();
         //if ((time - lastRenderTime) > 0.015 && render) {
-            Engine::renderChunks(game_world.getAmbientStrength());
+            Engine::prepareRendering(game_world.getAmbientStrength());
+            game_world.render();
+            Engine::finishRendering();
             fps_controller.update();
           //  lastRenderTime = time;
             //std::this_thread::sleep_for(std::chrono::milliseconds(1));
