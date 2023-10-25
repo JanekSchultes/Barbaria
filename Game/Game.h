@@ -7,6 +7,8 @@
 
 #include <GLFW/glfw3.h>
 #include <thread>
+#include <mutex>
+#include <chrono>
 
 #define GAME_TITLE "Barbaria"
 #define WINDOW_SIZE_X 1920.0f
@@ -16,6 +18,8 @@ class Game {
 public:
     Game();
     void game_loop();
+    void compute_loop();
+    bool render = false;
 private:
     Window game_window = Window(GAME_TITLE, WINDOW_SIZE_X, WINDOW_SIZE_Y);
     InputHandler fps_input_handler = InputHandler(&game_window);
@@ -25,10 +29,6 @@ private:
     Shader precalc_shader = Shader("assets/shaders/voxel_shader_precalc.vs", "assets/shaders/voxel_shader_precalc.fs");
     PerspectiveView fps_view = PerspectiveView(45.0f, WINDOW_SIZE_X / WINDOW_SIZE_Y, 0.01f, 100.0f);
     World game_world = World();
-
-    std::thread render_thread;
-    std::thread input_thread;
-    std::thread world_thread;
 };
 
 #endif

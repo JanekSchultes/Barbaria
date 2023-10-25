@@ -5,6 +5,8 @@ float Camera::mouseSensitivity = 0.01f;
 float Camera::yaw = 90.0f;
 float Camera::pitch = 0.0f;
 
+std::mutex camera_lock;
+
 Camera::Camera() {
     cameraPosition = glm::vec3(2.0f, 2.0f, 5.0f);
     cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -42,11 +44,17 @@ void Camera::update() {
     cameraFront = glm::normalize(cameraFront);
     cameraRight = glm::normalize(glm::cross(cameraFront, worldUP));
     cameraUP = glm::normalize(glm::cross(cameraRight, cameraFront));
+    camera_lock.lock();
     viewMatrix = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUP);
+    camera_lock.unlock();
 }
 
 glm::mat4 Camera::getViewMatrix() {
-    return viewMatrix;
+    glm::mat4 tmp;
+    camera_lock.lock();
+    tmp = viewMatrix;
+    camera_lock.unlock();
+    return tmp;
 }
 
 glm::vec3 Camera::getCameraPosition() {

@@ -22,6 +22,7 @@
 
 #include <memory.h>
 #include <math.h>
+#include <mutex>
 
 class World {
 public:
@@ -29,8 +30,8 @@ public:
     void updatePlayerPos(Vec3 pos, bool regen);
     void loadInitialChunks(Vec2 spawn_pos);
     void doTick();
+    float getAmbientStrength();
     ~World();
-    float ambient_strength = 0.0f;
 private:
     float getClimate(Vec2 chunk_pos);
     float getBaseLevel(Vec2 chunk_pos);
@@ -38,6 +39,7 @@ private:
     Chunk** chunks;
     int day_time = 0;
     int day_count = 0;
+    float ambient_strength = 0.0f;
 };
 
 #endif

@@ -69,7 +69,6 @@ void Engine::renderChunks(float ambient_strength) {
     auto it = shaders.find("precalc_shader");
     it->second.bind();
     it->second.pushMatrix4f(active_view.getMatrix(), "projectionMatrix");
-    active_camera.update();
     it->second.pushMatrix4f(active_camera.getViewMatrix(), "viewMatrix");
 
     VoxelRender::render();
@@ -92,7 +91,6 @@ void Engine::renderChunks(float ambient_strength) {
     glDepthMask(GL_TRUE);
 
     glfwSwapBuffers(active_window.getWindowPointer());
-
     glfwPollEvents();
 }
 

@@ -76,7 +76,8 @@ void FPSController::right_release() {
     right_pressed = false;
 }
 
-void FPSController::update() {
+void FPSController::update(){
+
     if (right_pressed) camera->moveRight();
     if (left_pressed) camera->moveLeft();
     if (forward_pressed) camera->moveForward();

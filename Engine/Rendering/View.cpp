@@ -1,4 +1,6 @@
 #include "View.h"
+    
+std::mutex view_lock;
 
 View::View() {
 
@@ -10,7 +12,11 @@ PerspectiveView::PerspectiveView(float view_angle, float ratio, float near_clip,
 }
 
 glm::mat4 View::getMatrix() {
-    return projection_matrix;
+    glm::mat4 tmp;
+    view_lock.lock();
+    tmp = projection_matrix;
+    view_lock.unlock();
+    return tmp;
 }
 
 OrthogonalView::OrthogonalView() {

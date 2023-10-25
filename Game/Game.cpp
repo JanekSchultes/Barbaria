@@ -1,8 +1,12 @@
 #include "Game.h"
 
+#include <iostream>
+#include <GLFW/glfw3.h>
+
 double lastRenderTime = 0.0;
 double lastTickTime = 0.0;
 double lastInputTime = 0.0;
+
 
 Game::Game() {
     Engine::init();
@@ -25,30 +29,29 @@ Game::Game() {
     lastRenderTime = glfwGetTime();
     lastTickTime = glfwGetTime();
     lastInputTime = glfwGetTime();
+    glfwMakeContextCurrent(NULL);
 }
 
 void Game::game_loop() {
-    if ((glfwGetTime() - lastRenderTime) > 0.015) {
-        render_thread.join();
-        render_thread = std::thread(Engine::renderChunks, game_world.ambient_strength);
-        //Engine::renderChunks(game_world.ambient_strength);
-        lastRenderTime = glfwGetTime();
+    /*double time = glfwGetTime();
+    if ((time - lastTickTime) > 0.015) {
+        game_world.doTick();
+        lastTickTime = time;
     }
 
-    if ((glfwGetTime() - lastTickTime) > 0.015) {
-        render_thread.join();
-        world_thread.join();
-        world_thread = std::thread(&World::doTick, &game_world);
-        //game_world.doTick();
-        lastTickTime = glfwGetTime();
-    }
-
-    if((glfwGetTime() - lastInputTime) > 0.015) {
-        render_thread.join();
-        input_thread.join();
-        input_thread = std::thread(&FPSController::update);
-        //fps_controller.update();
-        lastInputTime = glfwGetTime();
+    if((time - lastInputTime) > 0.015) {
+        fps_controller.update();
+        lastInputTime = time;
+    }*/
+    glfwMakeContextCurrent(game_window.getWindowPointer());
+    while (1) {
+       // double time = glfwGetTime();
+        //if ((time - lastRenderTime) > 0.015 && render) {
+            Engine::renderChunks(game_world.getAmbientStrength());
+            fps_controller.update();
+          //  lastRenderTime = time;
+            //std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        //}
     }
 
     /*if((glfwGetTime() - lastInputTime) > 0.45) {
@@ -57,4 +60,16 @@ void Game::game_loop() {
         lastInputTime = 0.0;
         input_thread.join();
     }*/
+}
+
+void Game::compute_loop() {
+    while (1) {
+        double time = glfwGetTime();
+        if ((time - lastInputTime) > 0.015) {
+            game_world.doTick();
+            Engine::getActiveCamera().update();
+            lastInputTime = time;
+        }
+        //std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
 }

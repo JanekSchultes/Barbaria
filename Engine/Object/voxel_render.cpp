@@ -70,6 +70,10 @@ namespace VoxelRender {
     GLuint vao = 0;
     GLuint vbo = 0;
     std::vector<unsigned int> free_ids(0);
+
+    GLint* base_vertices = nullptr;
+    GLsizei* counts = nullptr;
+    GLvoid** indicess = nullptr;
 }
 
 void VoxelRender::setupVoxelRender() {
@@ -84,6 +88,29 @@ void VoxelRender::setupVoxelRender() {
         indices[5 + i * 6] = 0 + i * 4;
     }
 
+    /*indicess = new GLvoid[face_count];
+    for (int i = 0; i < face_count; ++i) {
+        indicess[i] = 0;
+    }
+
+    base_vertices = new GLint[face_count];
+    for (int i = 0; i < face_count; ++i) {
+        base_vertices[i] = i * 4;
+    }
+
+    counts = new GLsizei[face_count];
+    for (int i = 0; i < face_count; ++i) {
+        counts[i] = 6;
+    }
+
+    indices = new unsigned int[6];
+    indices[0] = 0;
+    indices[1] = 1;
+    indices[2] = 2;
+    indices[3] = 2;
+    indices[4] = 3;
+    indices[5] = 0;*/
+
 
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -92,6 +119,7 @@ void VoxelRender::setupVoxelRender() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, max_face_count * 6 * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
     glBufferData(GL_ARRAY_BUFFER, VERTEX_BUFFER_INITIAL_SIZE, (void*)0, GL_STATIC_DRAW);
     glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, DATA_PER_VERTEX * sizeof(unsigned int), (void*)0);
     glVertexAttribIPointer(1, 1, GL_UNSIGNED_INT, DATA_PER_VERTEX * sizeof(unsigned int), (void*)(sizeof(unsigned int)));
@@ -139,4 +167,5 @@ void VoxelRender::render() {
     glBindVertexArray(vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
     glDrawElements(GL_TRIANGLES, face_count * 6, GL_UNSIGNED_INT, 0);
+    //glMultiDrawElementsBaseVertex(GL_TRIANGLES, counts, GL_UNSIGNED_INT, (void**)indicess, face_count, base_vertices);
 }

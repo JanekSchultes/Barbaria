@@ -1,5 +1,7 @@
 #include "World.h"
 
+std::mutex world_lock;
+
 #define DAY_DURATION 2
 float day_b = (2 * M_PI) / (DAY_DURATION * 60 * 3);
 
@@ -54,7 +56,17 @@ void World::doTick() {
         day_time = 0;
         day_count++;
     }
+    world_lock.lock();
     ambient_strength = 0.4 - 0.2 * cos(day_b * (float)day_time);
+    world_lock.unlock();
+}
+
+float World::getAmbientStrength() {
+    float ret;
+    world_lock.lock();
+    ret = ambient_strength;
+    world_lock.unlock();
+    return ret;
 }
 
 float World::getClimate(Vec2 chunk_pos) {

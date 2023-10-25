@@ -2,6 +2,7 @@
 #define FPS_CONTROLLER
 
 #include <iostream>
+#include <mutex>
 
 #include "Controller.h"
 #include "../../Engine/Engine.h"
@@ -23,7 +24,7 @@ public:
     static void backward_release();
     static void left_release();
     static void right_release();
-    static void update();
+    static void update(); 
     static void mouse_movement(double xpos, double ypos);
     static Camera* camera;
     static bool first_movement;
