@@ -6,7 +6,7 @@
 #include <GL/glew.h>
 #include <iostream>
 
-#define CHUNK_INITAL_FACE_STORAGE 16 * 16 * 16
+#define CHUNK_INITAL_FACE_STORAGE 16 * 16 * 16  * 5
 #define DATA_PER_VERTEX 3
 #define VERTICES_PER_QUAD 4
 

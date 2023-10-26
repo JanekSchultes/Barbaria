@@ -51,9 +51,9 @@ void World::updatePlayerPos(Vec3 pos, bool regenChunks) {
 }
 
 void World::render() {
-    for(int i = 0; i < VIEW_DISTANCE; ++i) {
-        for(int j = 0; j < VIEW_DISTANCE; ++j) {
-            chunks[i][j].render();
+    for (int i = -VIEW_DISTANCE; i <= VIEW_DISTANCE; ++i) {
+        for(int j = -VIEW_DISTANCE; j <= VIEW_DISTANCE; ++j) {
+            chunks[i + VIEW_DISTANCE][j + VIEW_DISTANCE].render();
         }
     }
 }
