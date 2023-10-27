@@ -6,7 +6,7 @@
 #include <GL/glew.h>
 #include <iostream>
 
-#define CHUNK_INITAL_FACE_STORAGE 16 * 16 * 16  * 5
+#define CHUNK_INITAL_FACE_STORAGE 16 * 16 * 16 
 #define DATA_PER_VERTEX 3
 #define VERTICES_PER_QUAD 4
 
@@ -46,6 +46,7 @@ private:
     std::vector<unsigned int> indices;
     std::vector<unsigned int> free_vao_locations;
     std::mutex *gl_mutex;
+    int buffer_multiplied_size = 1;
 };
 
 #endif
