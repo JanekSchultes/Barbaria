@@ -27,7 +27,7 @@ private:
     FPSController fps_controller = FPSController(&fps_input_handler);
     Shader fps_shader = Shader("assets/shaders/voxel_shader.vs", "assets/shaders/voxel_shader.fs");
     Shader precalc_shader = Shader("assets/shaders/voxel_shader_precalc.vs", "assets/shaders/voxel_shader_precalc.fs");
-    PerspectiveView fps_view = PerspectiveView(45.0f, WINDOW_SIZE_X / WINDOW_SIZE_Y, 0.01f, 100.0f);
+    PerspectiveView fps_view = PerspectiveView(45.0f, WINDOW_SIZE_X / WINDOW_SIZE_Y, 0.01f, 500.0f);
     World game_world = World();
 };
 

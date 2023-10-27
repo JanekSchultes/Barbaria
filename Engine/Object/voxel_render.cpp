@@ -94,8 +94,8 @@ ChunkRender::ChunkRender() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.capacity() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-     glBufferData(GL_ARRAY_BUFFER, indices.capacity() / 6 * DATA_PER_VERTEX *  sizeof(unsigned int), (void*)0, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER,indices.size() / 6 * 4 * DATA_PER_VERTEX *  sizeof(unsigned int), (void*)0, GL_STATIC_DRAW);
     
     glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, DATA_PER_VERTEX * sizeof(unsigned int), (void*)0);
     glVertexAttribIPointer(1, 1, GL_UNSIGNED_INT, DATA_PER_VERTEX * sizeof(unsigned int), (void*)(sizeof(unsigned int)));
@@ -137,38 +137,46 @@ void ChunkRender::register_face(unsigned int& id, Vec3 pos, Vec2 chunk_pos, Bloc
     }
 
     BlockFaceInfo info{ (int)pos.x, (int)pos.y, (int)pos.z, (int)chunk_pos.x, (int)chunk_pos.y, true, (int)block_index.x, (int)block_index.y, facing };
-    int byte_position = (CHUNK_INITAL_FACE_STORAGE * buffer_multiplied_size - id - 1) * VERTICES_PER_QUAD * DATA_PER_VERTEX * sizeof(unsigned int);
+	int byte_id = (CHUNK_INITAL_FACE_STORAGE * buffer_multiplied_size - id) + CHUNK_INITAL_FACE_STORAGE * (buffer_multiplied_size - 1) - 1;
+    int byte_position = byte_id * VERTICES_PER_QUAD * DATA_PER_VERTEX * sizeof(unsigned int);
     int byte_size = VERTICES_PER_QUAD * DATA_PER_VERTEX * sizeof(unsigned int);
 
     //std::cout << "Registering face... Pos: " << pos.x << " " << pos.y << " " << pos.z << " Facing:" << facing << "\n";
 
     gl_mutex->lock();
     if(needs_buffer_regen){
-        glBindBuffer(GL_COPY_READ_BUFFER, vbo);
-        unsigned int tmp;
-        glGenBuffers(1, &tmp);
-        glBindBuffer(GL_COPY_WRITE_BUFFER, tmp);
+        unsigned int face_count = CHUNK_INITAL_FACE_STORAGE * buffer_multiplied_size;
+        unsigned int old_face_count = CHUNK_INITAL_FACE_STORAGE * (buffer_multiplied_size - 1);
 
-        glBufferData(GL_COPY_WRITE_BUFFER, buffer_multiplied_size * CHUNK_INITAL_FACE_STORAGE * VERTICES_PER_QUAD *  DATA_PER_VERTEX *  sizeof(unsigned int), (void*)0, GL_STATIC_DRAW);
-        unsigned int old_buffer_size = (buffer_multiplied_size - 1) * CHUNK_INITAL_FACE_STORAGE * VERTICES_PER_QUAD * DATA_PER_VERTEX * sizeof(unsigned int);
-        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, old_buffer_size - 1, old_buffer_size);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-       
-        glDeleteBuffers(1, &vbo);
-        vbo = tmp;
-        unsigned int tmp_vao;
-        glGenVertexArrays(1, &tmp_vao);
-        glDeleteVertexArrays(1, &vao);
-        vao = tmp_vao;
-        glBindVertexArray(vao);
+        /* Create temporary buffers to keep the old data */
+        unsigned int old_vbo_data = 0;
+        unsigned int old_data_size = 0;
+        glGenBuffers(1, &old_vbo_data);
+        glBindBuffer(GL_ARRAY_BUFFER, old_vbo_data);
+        glBufferData(GL_ARRAY_BUFFER, old_face_count * VERTICES_PER_QUAD * DATA_PER_VERTEX * sizeof(unsigned int), (void*)0, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_COPY_READ_BUFFER, vbo);
+        glBindBuffer(GL_COPY_WRITE_BUFFER, old_vbo_data);
+        old_data_size = old_face_count * VERTICES_PER_QUAD * DATA_PER_VERTEX * sizeof(unsigned int);
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, old_data_size);
+
+        /* Extend buffer sizes */
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        
-        glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, DATA_PER_VERTEX * sizeof(unsigned int), (void*)0);
-        glVertexAttribIPointer(1, 1, GL_UNSIGNED_INT, DATA_PER_VERTEX * sizeof(unsigned int), (void*)(sizeof(unsigned int)));
-        glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, DATA_PER_VERTEX * sizeof(unsigned int), (void*)(2 * sizeof(unsigned int)));
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
+
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, face_count * 6 * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER,face_count * VERTICES_PER_QUAD * DATA_PER_VERTEX *  sizeof(unsigned int), (void*)0, GL_STATIC_DRAW);
+    
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        /* Copy back the buffers */
+        unsigned int data_size = 0;
+
+        glBindBuffer(GL_COPY_READ_BUFFER, old_vbo_data);
+        glBindBuffer(GL_COPY_WRITE_BUFFER, vbo);
+        data_size = old_face_count * VERTICES_PER_QUAD * DATA_PER_VERTEX * sizeof(unsigned int);
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, data_size);
 
     }
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
